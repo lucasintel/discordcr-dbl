@@ -14,7 +14,7 @@ module Dbl
   class Server
     def initialize(@authorization : String, @port = 3500)
       post "/", Authenticator.new(@authorization) do |ctx|
-        payload = Payload.from_json(ctx.request.body.as(IO))
+        payload = Vote.from_json(ctx.request.body.as(IO))
         @handlers.each(&.call(payload))
       end
 
@@ -25,8 +25,8 @@ module Dbl
       spawn Raze.run
     end
 
-    @handlers = [] of Payload ->
-    def on_vote(&handler : Payload ->)
+    @handlers = [] of Vote ->
+    def on_vote(&handler : Vote ->)
       @handlers << handler
     end
   end

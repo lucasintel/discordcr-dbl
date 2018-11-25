@@ -1,8 +1,14 @@
 module Dbl
-  struct Payload
+  module UInt64Converter
+    def self.from_json(value : JSON::PullParser) : UInt64
+      value.read_string.to_u64
+    end
+  end
+
+  struct Vote
     JSON.mapping(
-      bot: UInt64,
-      user: UInt64,
+      bot: {type: UInt64, converter: UInt64Converter},
+      user: {type: UInt64, converter: UInt64Converter},
       isWeekend: Bool,
       type: String
     )
@@ -10,7 +16,7 @@ module Dbl
 
   struct Bot
     JSON.mapping(
-      id: String,
+      id: {type: UInt64, converter: UInt64Converter},
       username: String,
       discriminator: String,
       avatar: String?,
