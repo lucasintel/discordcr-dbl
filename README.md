@@ -1,12 +1,23 @@
-# DBL Crystal Library (WIP)
+# discordcr-dbl
 
 Crystal API wrapper for discordbots.org.
 
 ## Example
 
 ```crystal
-dbl_stats = Dbl::Client.new(ENV["DBL_TOKEN"], client)
-dbl = Dbl::Server(ENV["DBL_PASS"])
+# Post stats to DBL every 30 minutes
+dbl_client = Dbl::Client.new(ENV["DBL_TOKEN"], client)
+
+dbl_client.get_bot(id)
+dbl_client.get_bot_stats(id)
+dbl_client.get_bots({ "search" => "library: discordcr" })
+
+# Start webhook server on port  3500 (default)
+dbl = Dbl::Server(ENV["DBL_PASS"], 3500)
+
+dbl_client.on_post do |req|
+  puts req.inspect
+end
 
 dbl.on_vote do |payload|
   ...
