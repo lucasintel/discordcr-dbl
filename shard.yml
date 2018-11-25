@@ -1,0 +1,13 @@
+name: dbl
+version: 0.1.0
+
+authors:
+  - kandayo <kandayo@riseup.net>
+
+dependencies:
+  raze:
+    github: samueleaton/raze
+
+crystal: 0.27.0
+
+license: MIT
