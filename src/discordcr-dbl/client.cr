@@ -5,17 +5,13 @@ module Dbl
   class Client
     BASE = URI.parse("https://discordbots.org")
 
-    def initialize(authorization_token : String, bot : Discord::Client)
+    def initialize(authorization_token : String, cache : Discord::Cache? = nil)
       @client = HTTP::Client.new(BASE)
-      @cache = bot.cache.as(Discord::Cache)
+      @cache = cache.as(Discord::Cache)
 
       @client.before_request do |req|
         req.headers["Authorization"] = authorization_token
         req.headers["content-type"] = "application/json"
-      end
-
-      bot.on_ready do |payload|
-        spawn(start)
       end
     end
 
@@ -39,6 +35,18 @@ module Dbl
       Stats.from_json(handle_response(res))
     end
 
+    def start
+      spawn {
+        loop {
+          sleep 1800
+
+          @client.post("/api/bots/stats", body: {server_count: @cache.guilds.size}.to_json) do |res|
+            @handlers.each(&.call(res))
+          end
+        }
+      }
+    end
+
     private def to_query_params(params : Hash(String, String))
       HTTP::Params.build do |form_builder|
         params.each do |key, value|
@@ -52,14 +60,6 @@ module Dbl
         res.body
       else
         raise ClientException.new(res)
-      end
-    end
-
-    private def start
-      loop do
-        res = @client.post("/api/bots/stats", body: {server_count: @cache.guilds.size}.to_json)
-        @handlers.each(&.call(res))
-        sleep 1800
       end
     end
   end
